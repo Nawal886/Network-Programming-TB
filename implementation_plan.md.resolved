@@ -1,0 +1,138 @@
+# Py-SiteCheck - Web Availability Monitor Implementation Plan
+
+Aplikasi monitoring ketersediaan website dengan GUI modern menggunakan Python. Aplikasi ini akan memantau status website secara real-time dengan fitur HTTP status checking, latency measurement, dan port checking.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **GUI Framework**: Saya akan menggunakan **CustomTkinter** untuk GUI karena memberikan tampilan modern dengan tema dark mode yang bagus. Pastikan Anda setuju dengan pilihan ini.
+
+> [!NOTE]
+> Aplikasi akan disimpan di `C:\Users\Acer\.gemini\antigravity\scratch\Py-SiteCheck`
+
+---
+
+## Architecture Overview
+
+```mermaid
+graph TB
+    subgraph GUI Layer
+        A[Main Window] --> B[Sidebar Navigation]
+        A --> C[Dashboard View]
+        A --> D[Add URL Dialog]
+    end
+    
+    subgraph Core Layer
+        E[Site Monitor Thread] --> F[HTTP Checker]
+        E --> G[Port Checker]
+        E --> H[Latency Meter]
+    end
+    
+    subgraph Data Layer
+        I[URL Manager]
+        J[Status Cache]
+    end
+    
+    C --> E
+    F --> J
+    G --> J
+    H --> J
+    I --> E
+```
+
+---
+
+## Proposed Changes
+
+### Core Module - Network Utilities
+
+#### [NEW] [monitor.py](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/core/monitor.py)
+- `SiteMonitor` class dengan threading untuk monitoring paralel
+- `check_http_status()` - HTTP/HTTPS request dengan status code validation
+- `check_port()` - TCP socket connection untuk port 80/443
+- `measure_latency()` - Response time measurement dalam milliseconds
+
+#### [NEW] [utils.py](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/core/utils.py)
+- Helper functions untuk URL parsing dan validation
+- Status code descriptions mapping
+
+---
+
+### GUI Module - User Interface
+
+#### [NEW] [main.py](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/main.py)
+- Entry point aplikasi
+- Window initialization dan event loop
+
+#### [NEW] [app.py](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/gui/app.py)
+- `PySiteCheckApp` - Main application window
+- Sidebar navigation dengan menu items
+- Dashboard container untuk site cards
+
+#### [NEW] [components.py](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/gui/components.py)
+- `SiteCard` - Card widget untuk menampilkan status setiap website
+- `AddURLDialog` - Dialog untuk menambahkan URL baru
+- `StatusIndicator` - Visual indicator (green/red/yellow)
+
+#### [NEW] [theme.py](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/gui/theme.py)
+- Color palette dan styling constants
+- Modern dark theme configuration
+
+---
+
+### Configuration
+
+#### [NEW] [requirements.txt](file:///C:/Users/Acer/.gemini/antigravity/scratch/Py-SiteCheck/requirements.txt)
+```
+customtkinter>=5.2.0
+requests>=2.31.0
+Pillow>=10.0.0
+```
+
+---
+
+## Design Mockup
+
+![Py-SiteCheck UI Mockup](file:///C:/Users/Acer/.gemini/antigravity/brain/566d3b35-ea05-4098-ba48-36e85b59c4d3/pysitecheck_mockup_1770210208548.png)
+
+### GUI Features:
+| Feature | Description |
+|---------|-------------|
+| **Dark Theme** | Modern dark color scheme dengan glassmorphism effects |
+| **Sidebar** | Navigation menu (Dashboard, Sites, Alerts, Settings) |
+| **Site Cards** | Grid layout dengan status indicator, response time, HTTP code |
+| **Add URL Button** | Quick add dialog untuk menambah website baru |
+| **Auto Refresh** | Pemantauan otomatis dengan interval yang dapat dikonfigurasi |
+
+---
+
+## Verification Plan
+
+### Manual Testing
+
+**Test 1: Application Launch**
+1. Buka terminal di folder `C:\Users\Acer\.gemini\antigravity\scratch\Py-SiteCheck`
+2. Jalankan `pip install -r requirements.txt`
+3. Jalankan `python main.py`
+4. Verifikasi aplikasi muncul dengan GUI yang benar
+
+**Test 2: Add Website**
+1. Klik tombol "+ Add URL"
+2. Masukkan URL seperti `https://google.com`
+3. Klik "Add"
+4. Verifikasi card baru muncul di dashboard
+
+**Test 3: Status Monitoring**
+1. Tambahkan beberapa URL (google.com, github.com, invalid-url-test.xyz)
+2. Verifikasi status online menunjukkan warna hijau
+3. Verifikasi status offline/error menunjukkan warna merah
+4. Verifikasi response time muncul dalam milliseconds
+
+**Test 4: Port Checking**
+1. Tambahkan URL website
+2. Verifikasi informasi port check (80/443) ditampilkan
+
+**Test 5: Graceful Exit**
+1. Tutup aplikasi dengan tombol close
+2. Verifikasi tidak ada error di terminal
+3. Verifikasi semua thread stopped dengan benar
